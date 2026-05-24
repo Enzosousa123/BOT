@@ -28,7 +28,10 @@ Entre agora e tenha acesso ao melhor, de forma segura, organizada e sem limites!
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
-
+await context.bot.send_message(
+    chat_id=ADMIN_ID,
+    text=f"✅ Alguien inició el bot\nChat ID: {chat_id}"
+)
     await context.bot.send_video(chat_id=chat_id, video=open("video1.mp4", "rb"))
 
     await context.bot.send_message(chat_id=chat_id, text=SCRIPT)
