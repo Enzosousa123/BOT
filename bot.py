@@ -8,8 +8,8 @@ from telegram.ext import (
     filters
 )
 
-TELEGRAM_TOKEN = "8770603181:AAFDbg1posWrZZYJbK_faSVVVatENtCFnnc"
-ADMIN_ID = 8261186165  # Pon aquí tu ID de Telegram
+TELEGRAM_TOKEN = "TU_TOKEN_AQUI"
+ADMIN_ID = 8261186165
 
 SCRIPT = """🎉 Seja muito bem-vindo(a)! Assista ao vídeo acima e tenha um gostinho do que está por vir! 🔥👆🏻
 
@@ -28,19 +28,30 @@ Entre agora e tenha acesso ao melhor, de forma segura, organizada e sem limites!
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
 
+    # Aviso al admin
     await context.bot.send_message(
         chat_id=ADMIN_ID,
         text=f"✅ Alguien inició el bot\nChat ID: {chat_id}"
     )
 
-    await context.bot.send_video(chat_id=chat_id, video=open("video1.mp4", "rb"))
+    # Video 1
+    await context.bot.send_video(
+        chat_id=chat_id,
+        video=open("video1.mp4", "rb")
+    )
 
-    await context.bot.send_message(chat_id=chat_id, text=SCRIPT)
+    # Texto
+    await context.bot.send_message(
+        chat_id=chat_id,
+        text=SCRIPT
+    )
 
-    await context.bot.send_video(chat_id=chat_id, video=open("video2.mp4", "rb"))
+    # Video 2
+    await context.bot.send_video(
+        chat_id=chat_id,
+        video=open("video2.mp4", "rb")
+    )
 
     botones = [
         [InlineKeyboardButton("🔆 Diário por R$12,90", callback_data="diario")],
@@ -60,10 +71,13 @@ async def botones_respuesta(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "diario":
         texto = "🔆 Acesso diário por R$12,90"
+
     elif query.data == "vip":
         texto = "💎 Acesso VIP + Ocultos por R$15,93 (10% OFF)"
+
     elif query.data == "vitalicio":
         texto = "👑 Acesso Vitalício + Ocultos 🔐 por R$27,90 (10% OFF)"
+
     else:
         texto = "Opção inválida."
 
@@ -80,7 +94,14 @@ async def recibir_mensaje(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"📩 Nuevo mensaje\n\n👤 Usuario: @{usuario.username}\n🆔 Chat ID: {chat_id}\n💬 Mensaje: {mensaje}\n\nPara responder:\n/responder {chat_id} tu mensaje"
+        text=f"""📩 Nuevo mensaje
+
+👤 Usuario: @{usuario.username}
+🆔 Chat ID: {chat_id}
+💬 Mensaje: {mensaje}
+
+Para responder:
+/responder {chat_id} tu mensaje"""
     )
 
 async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -88,7 +109,9 @@ async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if len(context.args) < 2:
-        await update.message.reply_text("Uso correcto: /responder CHAT_ID mensaje")
+        await update.message.reply_text(
+            "Uso correcto:\n/responder CHAT_ID mensaje"
+        )
         return
 
     chat_id = int(context.args[0])
@@ -101,12 +124,22 @@ async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("✅ Mensaje enviado.")
 
+async def miid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        f"Tu ID es: {update.effective_user.id}"
+    )
+
 app = Application.builder().token(TELEGRAM_TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("responder", responder))
+app.add_handler(CommandHandler("miid", miid))
+
 app.add_handler(CallbackQueryHandler(botones_respuesta))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_mensaje))
+
+app.add_handler(
+    MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_mensaje)
+)
 
 print("Bot encendido...")
 app.run_polling()
